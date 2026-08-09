@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>作業パフォーマンス・セルフチェック｜山岸産業医事務所</title>
+<meta name="description" content="計算課題と文章題で、いまの集中力・作業ペースを自分で確かめる無料セルフチェック。所要3分。診断ではなく、自分の状態に気づくためのツールです。">
+<style>
+:root{
+  --bg:#f6f7f9; --card:#fff; --ink:#1f2933; --sub:#5a6773; --line:#e2e6ea;
+  --accent:#2f6f6b; --accent-soft:#e8f2f1; --accent-dark:#245450;
+  --ok:#2f7a4f; --ok-soft:#e7f4ec; --ng:#9f2f2f; --ng-soft:#fbeceb;
+  --warn:#b45309; --warn-soft:#fdf3e3;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+  line-height:1.75;font-size:16px;-webkit-text-size-adjust:100%;
+}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 80px}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700;margin:0 0 6px}
+h1{font-size:24px;line-height:1.4;margin:0 0 10px;font-weight:700}
+.lede{color:var(--sub);font-size:14px;margin:0 0 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 14px;font-weight:700}
+h3{font-size:15px;margin:22px 0 8px;font-weight:700;color:var(--accent-dark)}
+p{margin:0 0 12px}
+.small{font-size:13px;color:var(--sub)}
+.hide{display:none !important}
+
+.btn{font:inherit;font-weight:700;cursor:pointer;border-radius:10px;padding:12px 22px;border:1px solid var(--accent);background:var(--accent);color:#fff;transition:.15s}
+.btn:hover{background:var(--accent-dark)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.btn.lg{font-size:17px;padding:14px 32px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.center{justify-content:center}
+
+.hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:13px;color:var(--sub)}
+.hud .t{font-size:22px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.progress{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:18px}
+.progress i{display:block;height:100%;background:var(--accent);width:100%;transition:width .2s linear}
+
+.calc{text-align:center;padding:14px 0 4px}
+.calc .expr{font-size:46px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.04em;margin:8px 0 20px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:440px;margin:0 auto}
+.grid4 button{font:inherit;font-size:22px;font-weight:700;padding:16px 0;border:1px solid var(--line);background:var(--card);border-radius:10px;cursor:pointer;transition:.1s;font-variant-numeric:tabular-nums}
+.grid4 button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.grid4 button:active{transform:scale(.96)}
+.flash{height:22px;font-size:14px;font-weight:700;margin-top:12px}
+.flash.o{color:var(--ok)} .flash.x{color:var(--ng)}
+
+.pass{background:var(--accent-soft);border-radius:10px;padding:14px 16px;font-size:15.5px;line-height:1.85;margin-bottom:14px}
+.qtext{font-size:16.5px;font-weight:700;margin:0 0 14px}
+.opts{display:grid;gap:9px}
+.opts button{font:inherit;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px;transition:.15s;color:var(--ink)}
+.opts button:hover{border-color:var(--accent);background:var(--accent-soft)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+.metric{background:var(--accent-soft);border-radius:10px;padding:14px;text-align:center}
+.metric .v{font-size:28px;font-weight:700;color:var(--accent-dark);line-height:1.2;font-variant-numeric:tabular-nums}
+.metric .v small{font-size:14px;font-weight:400}
+.metric .k{font-size:12px;color:var(--sub);margin-top:2px}
+
+.box{border-radius:10px;padding:14px 16px;margin:14px 0;font-size:14.5px}
+.box p:last-child{margin-bottom:0}
+.box.tip{background:var(--accent-soft);border-left:4px solid var(--accent)}
+.box.warn{background:var(--warn-soft);border-left:4px solid var(--warn)}
+.box ul{margin:8px 0 0;padding-left:1.2em}
+.box li{margin-bottom:5px}
+
+table.hist{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:10px}
+table.hist th,table.hist td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right}
+table.hist th:first-child,table.hist td:first-child{text-align:left}
+table.hist th{color:var(--sub);font-weight:700;font-size:12px}
+.bar{height:8px;background:var(--accent);border-radius:99px;display:inline-block;vertical-align:middle}
+
+footer.ft{margin-top:32px;font-size:12px;color:var(--sub);line-height:1.8}
+.disc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:12.5px;color:var(--sub)}
+@media(max-width:480px){
+  h1{font-size:21px} .calc .expr{font-size:38px}
+  .grid4 button{font-size:19px;padding:14px 0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">山岸産業医事務所｜働く人のためのセルフチェック</p>
+  <h1>作業パフォーマンス・セルフチェック</h1>
+  <p class="lede">簡単な計算課題と文章題で、<strong>いまの集中力と作業ペース</strong>を自分で確かめます。所要約3分。結果はお使いのブラウザの中だけで処理され、送信されません。</p>
+</header>
+
+<section id="intro">
+  <div class="card">
+    <h2>このチェックについて</h2>
+    <p>2種類の課題に取り組みます。</p>
+    <p class="small" style="margin-bottom:16px">
+      <strong>① 計算課題（60秒）</strong>　1桁の足し算にできるだけ速く正確に答えます。作業のペースと、その持続を見ます。<br>
+      <strong>② 文章題（8問）</strong>　短い文章を読んで答えを選びます。読み取りと注意の持続を見ます。
+    </p>
+    <div class="box warn">
+      <p><b>これは診断ではありません。</b>本チェックの結果で病気の有無を判定することはできません。「今日は思ったより時間がかかった」「後半で崩れた」といった<b>自分の状態への気づき</b>を得るためのものです。</p>
+      <p style="margin-top:8px">結果が気になるとき、あるいは<b>睡眠がとれていない・仕事に集中できない状態が2週間以上続いている</b>ときは、点数にかかわらず産業医や医療機関にご相談ください。</p>
+    </div>
+    <div class="box tip">
+      <p><b>より役に立つ使い方</b></p>
+      <ul>
+        <li>体調のよい日に一度やっておき、<b>自分の基準値</b>を知っておく</li>
+        <li>繁忙期や睡眠不足の日にもう一度やって、平常時と比べる</li>
+        <li>同じ時間帯・同じ環境（静かな場所、同じ端末）で行うと比較しやすくなります</li>
+      </ul>
+    </div>
+    <div class="row center"><button class="btn lg" id="go">はじめる</button></div>
+  </div>
+</section>
+
+<section id="ready" class="hide">
+  <div class="card" style="text-align:center">
+    <h2 id="readyTitle"></h2>
+    <p id="readyDesc" class="small"></p>
+    <div class="row center"><button class="btn lg" id="readyBtn">開始</button></div>
+  </div>
+</section>
+
+<section id="calc" class="hide">
+  <div class="card">
+    <div class="hud"><span>① 計算課題</span><span class="t" id="clock">60</span></div>
+    <div class="progress"><i id="cbar"></i></div>
+    <div class="calc">
+      <div class="expr" id="expr"></div>
+      <div class="grid4" id="cops"></div>
+      <div class="flash" id="cflash"></div>
+    </div>
+    <p class="small" style="text-align:center;margin-top:14px">正解数 <b id="cnum">0</b>　／　誤答 <b id="cbad">0</b></p>
+  </div>
+</section>
+
+<section id="read" class="hide">
+  <div class="card">
+    <div class="hud"><span>② 文章題</span><span id="rcount"></span></div>
+    <div class="progress"><i id="rbar"></i></div>
+    <div class="pass" id="pass"></div>
+    <p class="qtext" id="rq"></p>
+    <div class="opts" id="rops"></div>
+  </div>
+</section>
+
+<section id="result" class="hide">
+  <div class="card">
+    <h2>結果</h2>
+    <h3>① 計算課題（60秒）</h3>
+    <div class="metrics">
+      <div class="metric"><div class="v" id="m1"></div><div class="k">正解数</div></div>
+      <div class="metric"><div class="v" id="m2"></div><div class="k">正答率</div></div>
+      <div class="metric"><div class="v" id="m3"></div><div class="k">平均回答時間</div></div>
+      <div class="metric"><div class="v" id="m4"></div><div class="k">後半のペース変化</div></div>
+    </div>
+    <h3>② 文章題（8問）</h3>
+    <div class="metrics">
+      <div class="metric"><div class="v" id="m5"></div><div class="k">正解数</div></div>
+      <div class="metric"><div class="v" id="m6"></div><div class="k">正答率</div></div>
+      <div class="metric"><div class="v" id="m7"></div><div class="k">平均回答時間</div></div>
+    </div>
+    <div id="comment"></div>
+
+    <h3>この結果の読み方</h3>
+    <p class="small">
+      得点そのものより、<b>①正答率が下がっていないか</b>、<b>②後半でペースが大きく落ちていないか</b>、<b>③普段の自分と比べてどうか</b>の3点に注目してください。
+      速さと正確さはトレードオフの関係にあり、「速いが誤答が多い」状態は、焦りや注意の途切れが起きているサインのことがあります。
+      逆に「遅いが正確」は、慎重さの現れであることも、処理の負担が増しているサインであることもあります。
+    </p>
+    <div class="box warn">
+      <p>繰り返しになりますが、この結果は<b>医学的な診断ではありません</b>。値が良くても不調が続いていれば相談が必要ですし、値が悪くても単に寝不足や環境要因のことがあります。</p>
+      <p style="margin-top:8px">気になる状態が続くときは、産業医面談やお近くの医療機関、地域産業保健センターにご相談ください。</p>
+    </div>
+
+    <div class="row center">
+      <button class="btn" id="retry">もう一度やる</button>
+      <button class="btn ghost" id="save">この端末に記録を残す</button>
+      <button class="btn ghost" id="clear">記録を削除</button>
+    </div>
+
+    <div id="histwrap" class="hide">
+      <h3>これまでの記録（この端末にのみ保存）</h3>
+      <table class="hist"><thead><tr><th>日時</th><th>計算正解</th><th>平均秒</th><th>文章題</th><th>ペース</th></tr></thead><tbody id="histbody"></tbody></table>
+      <p class="small" style="margin-top:8px">記録はブラウザのローカル領域にのみ保存されます。サーバーへは一切送信されません。「記録を削除」でいつでも消去できます。</p>
+    </div>
+  </div>
+</section>
+
+<footer class="ft">
+  <div class="disc">
+    <b>ご利用にあたって</b><br>
+    本ツールは健康や集中力に関する<b>気づきを促すことを目的とした簡易的なセルフチェック</b>であり、いかなる疾病の診断・スクリーニング・除外にも用いることはできません。結果を採用選考、人事評価、就業可否の判断に用いることは想定しておらず、適切ではありません。<br>
+    入力・回答内容は<b>すべてお使いのブラウザ内で処理</b>され、外部に送信されることはありません。「記録を残す」を選んだ場合のみ、お使いの端末のローカル領域に保存されます。<br>
+    心身の不調が続く場合は、産業医、医療機関、または地域産業保健センターにご相談ください。
+  </div>
+  <p style="margin-top:14px">© 山岸産業医事務所</p>
+</footer>
+
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const show=id=>{['intro','ready','calc','read','result'].forEach(s=>$(s).classList.add('hide'));$(id).classList.remove('hide');window.scrollTo({top:0,behavior:'smooth'});};
+
+const READS=[
+ {p:"事業場Aでは、毎週月曜と木曜に朝礼を行っている。ただし祝日にあたる日は朝礼を行わず、翌営業日に振り替える。ある週の木曜が祝日だった。",
+  q:"この週、朝礼が行われるのは何曜日でしょうか。", o:["月曜と金曜","月曜と木曜","火曜と金曜","月曜のみ"], a:0},
+ {p:"BさんはCさんより早く出社した。DさんはBさんより早く出社した。EさんはCさんより遅く出社した。",
+  q:"最も早く出社したのは誰でしょうか。", o:["Bさん","Cさん","Dさん","Eさん"], a:2},
+ {p:"ある倉庫では、箱を1段に4個ずつ、5段まで積む。棚は3列ある。現在、棚は満杯の状態から7個だけ運び出されている。",
+  q:"現在、倉庫にある箱は何個でしょうか。", o:["53個","57個","60個","47個"], a:0},
+ {p:"会議は14時に始まり、20分の議題を3つ扱った。議題と議題の間には5分の休憩をはさんだ。最後の議題のあとに休憩はない。",
+  q:"会議が終わるのは何時何分でしょうか。", o:["15時00分","15時05分","15時10分","15時15分"], a:2},
+ {p:"「この製品は、防水ではないが防滴である」と説明書に書かれている。防滴とは、水滴がかかる程度なら内部に浸入しないことをいう。",
+  q:"この説明から確実にいえることはどれでしょうか。", o:["水中に沈めても壊れない","雨に少しあたる程度なら内部に水が入らない","水に濡らしても絶対に故障しない","屋外では使用できない"], a:1},
+ {p:"ある部署の今月の残業時間は、Fさんが32時間、Gさんが18時間、Hさんが46時間、Iさんが24時間だった。",
+  q:"4人の平均残業時間は何時間でしょうか。", o:["28時間","30時間","32時間","34時間"], a:1},
+ {p:"手続きは、申請 → 一次確認 → 二次確認 → 承認 の順に進む。一次確認で不備があれば申請者に差し戻される。二次確認で不備があれば一次確認からやり直しとなる。",
+  q:"二次確認で不備が見つかった場合、次に行われるのはどれでしょうか。", o:["申請者への差し戻し","一次確認","承認","手続きの中止"], a:1},
+ {p:"ある店の営業時間は10時から19時までで、水曜は定休日である。ただし第3水曜のみ、13時から19時まで営業する。",
+  q:"第3水曜の11時に、この店はどうなっているでしょうか。", o:["営業している","営業していない","10時から営業している","19時まで営業していない"], a:1}
+];
+
+let calcLog=[], calcStart=0, timerId=null, curCalc=null, remain=60;
+let rIdx=0, rLog=[], rStart=0, rOrder=[];
+
+$('go').onclick=()=>prep('calc');
+
+function prep(which){
+  if(which==='calc'){
+    $('readyTitle').textContent='① 計算課題（60秒）';
+    $('readyDesc').innerHTML='1桁の足し算が次々に表示されます。4つの選択肢から正しい答えを、<b>できるだけ速く正確に</b>選んでください。<br>準備ができたら「開始」を押すと、すぐにカウントが始まります。';
+    $('readyBtn').onclick=startCalc;
+  }else{
+    $('readyTitle').textContent='② 文章題（全8問）';
+    $('readyDesc').innerHTML='短い文章を読んで、正しい答えを選んでください。制限時間はありませんが、<b>回答にかかった時間を計測</b>しています。落ち着いて、いつものペースで取り組んでください。';
+    $('readyBtn').onclick=startRead;
+  }
+  show('ready');
+}
+
+function nextCalc(){
+  const a=Math.floor(Math.random()*8)+2, b=Math.floor(Math.random()*8)+2;
+  const ans=a+b;
+  const set=new Set([ans]);
+  while(set.size<4){
+    let d=ans+(Math.floor(Math.random()*7)-3);
+    if(d>1&&d!==ans) set.add(d);
+  }
+  const opts=[...set].sort(()=>Math.random()-0.5);
+  curCalc={ans};
+  $('expr').textContent=a+' + '+b;
+  const box=$('cops'); box.innerHTML='';
+  opts.forEach(v=>{
+    const btn=document.createElement('button');
+    btn.textContent=v;
+    btn.onclick=()=>hitCalc(v);
+    box.appendChild(btn);
+  });
+  calcStart=performance.now();
+}
+
+function hitCalc(v){
+  const rt=(performance.now()-calcStart)/1000;
+  const ok=(v===curCalc.ans);
+  calcLog.push({ok,rt});
+  const f=$('cflash');
+  f.textContent = ok?'○ 正解':'× 不正解';
+  f.className = 'flash '+(ok?'o':'x');
+  setTimeout(()=>{f.textContent='';},350);
+  $('cnum').textContent=calcLog.filter(x=>x.ok).length;
+  $('cbad').textContent=calcLog.filter(x=>!x.ok).length;
+  nextCalc();
+}
+
+function startCalc(){
+  calcLog=[]; remain=60;
+  $('cnum').textContent='0'; $('cbad').textContent='0'; $('cflash').textContent='';
+  $('clock').textContent='60'; $('cbar').style.width='100%';
+  show('calc'); nextCalc();
+  timerId=setInterval(()=>{
+    remain--;
+    $('clock').textContent=remain;
+    $('cbar').style.width=(remain/60*100)+'%';
+    if(remain<=0){ clearInterval(timerId); prep('read'); }
+  },1000);
+}
+
+function startRead(){
+  rIdx=0; rLog=[];
+  rOrder=READS.map((r,i)=>i).sort(()=>Math.random()-0.5);
+  show('read'); showRead();
+}
+function showRead(){
+  const r=READS[rOrder[rIdx]];
+  $('rcount').textContent=(rIdx+1)+' / '+READS.length+'問';
+  $('rbar').style.width=(rIdx/READS.length*100)+'%';
+  $('pass').textContent=r.p;
+  $('rq').textContent=r.q;
+  const box=$('rops'); box.innerHTML='';
+  const marks=['ア','イ','ウ','エ'];
+  const order=r.o.map((t,i)=>({t,i})).sort(()=>Math.random()-0.5);
+  order.forEach((x,k)=>{
+    const b=document.createElement('button');
+    b.innerHTML='<b style="color:var(--accent);margin-right:8px">'+marks[k]+'</b>'+x.t;
+    b.onclick=()=>hitRead(x.i===r.a);
+    box.appendChild(b);
+  });
+  rStart=performance.now();
+}
+function hitRead(ok){
+  rLog.push({ok, rt:(performance.now()-rStart)/1000});
+  rIdx++;
+  if(rIdx<READS.length) showRead(); else finish();
+}
+
+let lastResult=null;
+function finish(){
+  const cOk=calcLog.filter(x=>x.ok).length, cAll=calcLog.length;
+  const cAcc=cAll?Math.round(cOk/cAll*100):0;
+  const cRt =cAll?(calcLog.reduce((s,x)=>s+x.rt,0)/cAll):0;
+  const h=Math.floor(cAll/2);
+  const first=calcLog.slice(0,h), second=calcLog.slice(h);
+  const f1=first.length?first.reduce((s,x)=>s+x.rt,0)/first.length:0;
+  const f2=second.length?second.reduce((s,x)=>s+x.rt,0)/second.length:0;
+  const drift=(f1&&f2)?Math.round((f2-f1)/f1*100):0;
+
+  const rOk=rLog.filter(x=>x.ok).length, rAll=rLog.length;
+  const rAcc=rAll?Math.round(rOk/rAll*100):0;
+  const rRt =rAll?(rLog.reduce((s,x)=>s+x.rt,0)/rAll):0;
+
+  $('m1').innerHTML=cOk+'<small> / '+cAll+'問</small>';
+  $('m2').innerHTML=cAcc+'<small>%</small>';
+  $('m3').innerHTML=cRt.toFixed(2)+'<small>秒</small>';
+  $('m4').innerHTML=(drift>0?'+':'')+drift+'<small>%</small>';
+  $('m5').innerHTML=rOk+'<small> / '+rAll+'問</small>';
+  $('m6').innerHTML=rAcc+'<small>%</small>';
+  $('m7').innerHTML=rRt.toFixed(1)+'<small>秒</small>';
+
+  const notes=[];
+  if(cAcc>=95&&cRt<2.0) notes.push('計算課題は速さと正確さの両方が保たれています。');
+  else if(cAcc>=95) notes.push('計算課題は正確に処理できています。ペースは慎重めでした。');
+  else if(cAcc<85) notes.push('計算課題で誤答がやや目立ちました。急ぎすぎか、注意が途切れやすい状態かもしれません。');
+  else notes.push('計算課題はおおむね安定していました。');
+
+  if(drift>=25) notes.push('後半で回答ペースが'+drift+'%落ちています。60秒程度でも集中の持続が難しくなっているサインのことがあります。');
+  else if(drift<=-15) notes.push('後半にかけてペースが上がっています。課題に慣れた効果とみられます。');
+  else notes.push('前半と後半で、ペースは大きく変わっていません。');
+
+  if(rAcc>=88) notes.push('文章題も安定して読み取れています。');
+  else if(rAcc<63) notes.push('文章題で取りこぼしがありました。条件の読み飛ばしが起きているかもしれません。');
+  else notes.push('文章題はおおむね読み取れています。');
+
+  $('comment').innerHTML='<div class="box tip"><p><b>今回の傾向</b></p><ul>'+notes.map(n=>'<li>'+n+'</li>').join('')+'</ul>'
+    +'<p style="margin-top:10px">これは<b>今この瞬間の状態</b>を映したものです。1回の結果で判断せず、体調のよい日の記録と見比べてください。</p></div>';
+
+  lastResult={d:new Date().toISOString(), cOk, cAll, cRt:+cRt.toFixed(2), rOk, rAll, drift};
+  show('result'); renderHist();
+}
+
+$('retry').onclick=()=>{ show('intro'); };
+
+const KEY='ysmo_focus_history_v1';
+function loadHist(){ try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ return []; } }
+function renderHist(){
+  const h=loadHist();
+  if(!h.length){ $('histwrap').classList.add('hide'); return; }
+  $('histwrap').classList.remove('hide');
+  const max=Math.max(...h.map(x=>x.cOk),1);
+  $('histbody').innerHTML=h.slice(-10).reverse().map(x=>{
+    const d=new Date(x.d);
+    const label=(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    return '<tr><td>'+label+'</td>'
+      +'<td><span class="bar" style="width:'+Math.round(x.cOk/max*46)+'px"></span> '+x.cOk+'</td>'
+      +'<td>'+x.cRt.toFixed(2)+'</td>'
+      +'<td>'+x.rOk+'/'+x.rAll+'</td>'
+      +'<td>'+(x.drift>0?'+':'')+x.drift+'%</td></tr>';
+  }).join('');
+}
+$('save').onclick=()=>{
+  if(!lastResult){return;}
+  try{
+    const h=loadHist(); h.push(lastResult);
+    localStorage.setItem(KEY,JSON.stringify(h.slice(-50)));
+    renderHist(); alert('この端末に記録しました。');
+  }catch(e){ alert('お使いのブラウザでは記録を保存できませんでした（プライベートモード等）。'); }
+};
+$('clear').onclick=()=>{
+  if(!confirm('この端末に保存された記録をすべて削除します。よろしいですか。'))return;
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  $('histwrap').classList.add('hide');
+};
+renderHist();
+</script>
+</body>
+</html>
