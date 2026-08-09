@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>休職・復職フローシミュレータ｜山岸産業医事務所</title>
+<meta name="description" content="厚生労働省「心の健康問題により休業した労働者の職場復帰支援の手引き」の5ステップに沿って、いま何をすべきかを対話式で確認できる無料ツール。人事・総務担当者向け。">
+<style>
+:root{
+  --bg:#f6f7f9; --card:#fff; --ink:#1f2933; --sub:#5a6773; --line:#e2e6ea;
+  --accent:#2f6f6b; --accent-soft:#e8f2f1; --accent-dark:#245450;
+  --warn:#b45309; --warn-soft:#fdf3e3; --danger:#9f2f2f; --ok:#2f7a4f;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+  line-height:1.75; font-size:16px; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:860px;margin:0 auto;padding:24px 16px 80px}
+header.hd{margin-bottom:24px}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700;margin:0 0 6px}
+h1{font-size:24px;line-height:1.4;margin:0 0 10px;font-weight:700}
+.lede{color:var(--sub);font-size:14px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 12px;font-weight:700}
+h3{font-size:15px;margin:20px 0 8px;font-weight:700;color:var(--accent-dark)}
+p{margin:0 0 12px}
+.small{font-size:13px;color:var(--sub)}
+
+.stepper{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.stepper button{
+  flex:1 1 140px;min-width:0;text-align:left;cursor:pointer;
+  background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;font:inherit;color:var(--sub);transition:.15s;
+}
+.stepper button:hover{border-color:var(--accent)}
+.stepper button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.stepper button.done{border-color:var(--accent);color:var(--accent-dark)}
+.stepper .n{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;opacity:.85}
+.stepper .t{display:block;font-size:13px;font-weight:700;line-height:1.35;margin-top:2px}
+
+ul.chk{list-style:none;padding:0;margin:0}
+ul.chk li{border-bottom:1px dashed var(--line);padding:10px 0}
+ul.chk li:last-child{border-bottom:none}
+ul.chk label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+ul.chk input{margin-top:5px;width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto}
+ul.chk .txt{flex:1}
+ul.chk .note{display:block;font-size:13px;color:var(--sub);margin-top:2px}
+ul.chk input:checked + .txt{color:var(--sub);text-decoration:line-through;text-decoration-color:var(--line)}
+
+.box{border-radius:10px;padding:14px 16px;margin:14px 0;font-size:14px}
+.box p:last-child{margin-bottom:0}
+.box.tip{background:var(--accent-soft);border-left:4px solid var(--accent)}
+.box.pit{background:var(--warn-soft);border-left:4px solid var(--warn)}
+.box b{font-weight:700}
+.box ul{margin:8px 0 0;padding-left:1.2em}
+.box li{margin-bottom:4px}
+
+.docs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.docs span{background:var(--accent-soft);color:var(--accent-dark);border-radius:99px;padding:4px 12px;font-size:13px;font-weight:600}
+
+.progress{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin:4px 0 18px}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+
+.nav{display:flex;gap:10px;margin-top:22px}
+.btn{
+  font:inherit;font-weight:700;cursor:pointer;border-radius:10px;padding:11px 18px;
+  border:1px solid var(--accent);background:var(--accent);color:#fff;transition:.15s;
+}
+.btn:hover{background:var(--accent-dark)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.nav .sp{flex:1}
+
+textarea{
+  width:100%;min-height:260px;font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,"Noto Sans JP",monospace;
+  border:1px solid var(--line);border-radius:10px;padding:12px;resize:vertical;background:#fbfcfd;color:var(--ink);
+}
+input[type=text],input[type=date]{
+  font:inherit;border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;max-width:280px;background:#fbfcfd;
+}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:4px}
+
+footer.ft{margin-top:32px;font-size:12px;color:var(--sub);line-height:1.8}
+footer.ft a{color:var(--accent)}
+.disc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:12.5px;color:var(--sub)}
+.hide{display:none}
+@media print{
+  .stepper,.nav,.progress,.no-print{display:none !important}
+  body{background:#fff}
+  .card{border:none;padding:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <p class="eyebrow">山岸産業医事務所｜人事・総務担当者向けツール</p>
+  <h1>休職・復職フローシミュレータ</h1>
+  <p class="lede">厚生労働省「心の健康問題により休業した労働者の職場復帰支援の手引き」（平成24年7月改訂）の5ステップに沿って、<strong>いま何をすべきか</strong>を確認できます。入力内容はブラウザの外に送信されません。</p>
+</header>
+
+<div class="progress"><i id="bar"></i></div>
+
+<nav class="stepper" id="stepper"></nav>
+
+<main id="panel"></main>
+
+<div class="nav no-print">
+  <button class="btn ghost" id="prev">← 前のステップ</button>
+  <span class="sp"></span>
+  <button class="btn" id="next">次のステップ →</button>
+</div>
+
+<section class="card" id="summary">
+  <h2>対応メモの出力</h2>
+  <p class="small">チェック状況から、社内共有用のメモを自動生成します。個人が特定される情報は入力しないでください。</p>
+  <div class="field">
+    <label for="caseid">案件の識別記号（氏名は入力しないでください）</label>
+    <input type="text" id="caseid" placeholder="例：2026-A">
+  </div>
+  <div class="field">
+    <label for="today">記録日</label>
+    <input type="date" id="today">
+  </div>
+  <button class="btn" id="gen">メモを生成する</button>
+  <button class="btn ghost" id="copy">コピー</button>
+  <button class="btn ghost" id="print">印刷 / PDF保存</button>
+  <div style="margin-top:14px"><textarea id="out" placeholder="「メモを生成する」を押すとここに出力されます。"></textarea></div>
+</section>
+
+<footer class="ft">
+  <div class="disc">
+    <b>ご利用にあたって</b><br>
+    本ツールは厚生労働省の公開資料をもとにした<b>一般的な手順の整理</b>であり、個別事案に対する医学的判断・法的助言ではありません。実際の対応は、産業医・主治医・社会保険労務士等の専門家、および自社の就業規則にしたがって決定してください。<br>
+    入力内容は<b>すべてお使いのブラウザ内で処理</b>され、サーバーへ送信・保存されることはありません。<br><br>
+    <b>主な出典</b>：厚生労働省・独立行政法人労働者健康安全機構「心の健康問題により休業した労働者の職場復帰支援の手引き」（平成16年10月策定、平成21年3月・平成24年7月改訂）／厚生労働省「健康診断結果に基づき事業者が講ずべき措置に関する指針」／労働安全衛生法
+  </div>
+  <p style="margin-top:14px">© 山岸産業医事務所</p>
+</footer>
+
+</div>
+
+<script>
+const STEPS = [
+{
+  n:"第1ステップ", t:"病気休業開始及び休業中のケア",
+  intro:"診断書の受理から休業中の療養環境づくりまで。ここで<strong>「安心して休める状態」</strong>をつくれるかが、その後の回復スピードを大きく左右します。",
+  items:[
+    ["病気休業診断書（主治医発行）を受理した","休業開始時に本人から提出を受けます。"],
+    ["管理監督者・人事労務担当者・産業保健スタッフの間で情報を共有した","誰が窓口になるかを一本化しておきます。"],
+    ["傷病手当金など経済的保障について説明した","健康保険の傷病手当金は、待期3日間の完成後、休業4日目以降が対象。支給開始日から通算1年6か月（令和4年1月改正で「通算」化）。"],
+    ["休業の最長（保障）期間を就業規則で確認し、本人に伝えた","期間満了の時期を本人が把握していないケースが非常に多い部分です。"],
+    ["療養中の連絡ルール（頻度・方法・窓口）を本人と取り決めた","過度な連絡も、連絡が途絶えることも、どちらも回復を妨げます。"],
+    ["不安・悩みの相談先、公的／民間の職場復帰支援サービスを案内した","地域産業保健センター、リワーク施設など。"],
+    ["業務の進捗連絡など負担となる連絡は控え、必要な連絡・情報提供は計画的に行う体制を整えた","手引きは、休業中でも接触することが望ましい結果をもたらす場合があるとしています。連絡を絶つのではなく、誰が・何を・どの頻度で伝えるかを決めることが重要です。"]
+  ],
+  docs:["病気休業診断書","傷病手当金支給申請書","就業規則（休職規定）の該当条文"],
+  tip:"手引きは、休業開始時に<b>「安心感の醸成」</b>を明示的な対応項目として挙げています。経済的保障・相談先・支援サービス・休業の最長期間の4点は、初期に必ず伝えてください。",
+  pit:"<b>よくある落とし穴</b><ul><li>休職期間の起算日・満了日を人事側も本人も把握しておらず、満了間際に慌てる。</li><li>診断書の「休養を要する」期間だけを見て、就業規則上の休職発令手続きを行っていない。</li><li>上司が個人的に頻繁に連絡し、本人が「戻らなければ」と焦って回復が遅れる。</li></ul>"
+},
+{
+  n:"第2ステップ", t:"主治医による職場復帰可能の判断",
+  intro:"本人からの復職意思表示と診断書の提出を受け、<strong>産業医等がその内容を精査</strong>します。診断書をそのまま復職決定の根拠にはしません。",
+  items:[
+    ["本人から職場復帰の意思表示を受けた","本人の意思が起点です。会社から復職を促す形にしないよう注意します。"],
+    ["「職場復帰可能」と記載された主治医の診断書を受理した",""],
+    ["産業医等が診断書の内容を精査した","主治医の判断は日常生活レベルの回復を基準にしていることがあり、業務遂行可能なレベルとは必ずしも一致しません。"],
+    ["必要な就業上の配慮を主治医に照会するため、本人の同意を得た","手引きは「事前に当該労働者への説明と同意を得ておく必要がある」と明記しています。"],
+    ["主治医に対し、当社の業務内容・復職制度・就業上の配慮の選択肢を情報提供した","主治医が職場の実態を知らないまま判断していることが少なくありません。"]
+  ],
+  docs:["職場復帰可能の診断書","本人の同意書（主治医への情報照会用）","業務内容説明資料"],
+  tip:"主治医と交換する情報は、手引き上<b>「職場で配慮すべき内容を中心とし、関係者の理解を得るために必要とされる病態や機能に関する最小限の情報」</b>とされています。<b>具体的な疾患名は必ずしもこれに含まれません。</b>",
+  pit:"<b>よくある落とし穴</b><ul><li>主治医の診断書＝復職決定、と扱ってしまう。復職の可否を判断するのは事業者であり、その判断を医学的に支えるのが産業医の役割です。</li><li>本人の同意を得ずに会社が主治医へ問い合わせてしまう（個人情報保護上の問題になります）。</li><li>会社側が業務内容を伝えていないため、主治医が「デスクワークなら可」といった実態と噛み合わない意見を書く。</li></ul>"
+},
+{
+  n:"第3ステップ", t:"職場復帰の可否の判断及び職場復帰支援プランの作成",
+  intro:"本ステップが実務上の<strong>山場</strong>です。情報収集と評価 → 可否の判断 → 支援プランの作成、の順に進めます。",
+  items:[
+    ["本人の職場復帰の意思と就業意欲を確認した","職場復帰支援プログラムの内容を説明し、同意を得ます。"],
+    ["産業医等が主治医から意見を収集した（様式例1：情報提供依頼書）","本人の同意を得たうえで実施します。"],
+    ["治療状況・病状の回復状況を確認した",""],
+    ["業務遂行能力を評価した","睡眠覚醒リズム、昼間の眠気（投薬によるものを含む）、注意力・集中力、安全な通勤の可否、業務と類似した行為の遂行状況と疲労の回復具合など。"],
+    ["今後の就業に関する本人の考えを聴いた",""],
+    ["職場環境等を評価した","業務および職場との適合性、作業管理・作業環境管理の状況、職場側の支援準備状況。"],
+    ["職場復帰の可否を総合的に判断した","手引きは「定型的な判断基準を示すことは困難であり、個々のケースに応じて総合的に判断」としています。"],
+    ["職場復帰支援プランを作成した","下記の6項目を盛り込みます。"],
+    ["試し出勤制度等を活用する場合、ルールと処遇を事前に定めた","模擬出勤／通勤訓練／試し出勤の3類型。"]
+  ],
+  docs:["様式例1 職場復帰支援に関する情報提供依頼書","様式例2 職場復帰支援に関する面談記録票","職場復帰支援プラン"],
+  tip:"<b>職場復帰支援プランに盛り込む6項目</b><ul><li>①職場復帰日</li><li>②管理監督者による就業上の配慮（業務内容・業務量の変更、残業／交替勤務／深夜業の制限、就業時間短縮、通院のための外出許可 など）</li><li>③人事労務管理上の対応等（配置転換・異動の必要性、フレックスや裁量労働の可否、出張・転勤の制限）</li><li>④産業医等による医学的見地からみた意見（安全配慮義務に関する助言 等）</li><li>⑤フォローアップ（誰が・どの方法で・いつ就業制限を見直すか、配慮が不要となる時期の見通し）</li><li>⑥その他（本人が自ら責任を持って行うべき事項、試し出勤制度等の利用、外部資源の活用）</li></ul>",
+  pit:"<b>よくある落とし穴</b><ul><li><b>「プログラム」と「プラン」の混同。</b>プログラム＝事業場全体のルール、プラン＝個別事案ごとの支援内容です。プログラムを整備しないまま個別対応を繰り返すと、判断がその都度ぶれます。</li><li>就業上の配慮の<b>終了時期</b>を決めていないため、時短勤務が何年も続いてしまう。</li><li>試し出勤で本人に実質的な作業指示を出しており、労働基準法等の適用や労災保険給付の対象となりうることを想定していない。処遇（賃金の有無）も事前に労使で取り決めが必要です。</li></ul>"
+},
+{
+  n:"第4ステップ", t:"最終的な職場復帰の決定",
+  intro:"復職直前の最終確認を行い、産業医等の意見書を踏まえて<strong>事業者が</strong>復職を決定します。",
+  items:[
+    ["労働者の状態を最終確認した","病状の再燃がないか、就業意欲が保たれているか。"],
+    ["産業医等が就業上の配慮等に関する意見書を作成した（様式例3）",""],
+    ["事業者として職場復帰を正式に決定し、本人に通知した","復職は事業者の決定事項です。"],
+    ["決定内容を主治医に情報提供した（様式例4）","職場復帰及び就業上の配慮に関する情報提供書。"],
+    ["受け入れ部署の管理監督者・同僚への説明範囲を本人と合意した","何をどこまで伝えるかを、本人の同意のうえで決めます。"],
+    ["原則として元の職場への復帰を検討した","手引きは「まずは元の職場への復帰」を原則としています。"]
+  ],
+  docs:["様式例3 職場復帰に関する意見書","様式例4 職場復帰及び就業上の配慮に関する情報提供書","復職辞令・通知書"],
+  tip:"手引きは<b>「まずは元の職場への復帰」を原則</b>とし、配置転換が必要と思われる事例でも、まずは元の慣れた職場で業務負担を軽減しながら経過を観察したうえで異動を考慮するほうがよい場合が多い、としています。<br>ただし<b>異動等を誘因として発症したケース</b>、職場要因と個人要因の不適合、運転業務・高所作業など危険を伴う業務、元の職場環境や同僚が大きく変わっている場合は例外として検討します。",
+  pit:"<b>よくある落とし穴</b><ul><li>「よかれと思って」負荷の軽い部署へ異動させ、慣れない環境と人間関係が新たな負担になる。</li><li>周囲への説明を本人の同意なく行い、信頼関係が損なわれる。</li><li>意見書に「就業上の配慮」は書かれているが、<b>誰が実行するか</b>が決まっていない。</li></ul>"
+},
+{
+  n:"第5ステップ", t:"職場復帰後のフォローアップ",
+  intro:"復職はゴールではなく<strong>スタート</strong>です。再燃・再発の多くはこの時期に起こります。",
+  items:[
+    ["疾患の再燃・再発、新しい問題の発生の有無を確認する仕組みがある","定期的な面談日程をあらかじめ設定しておきます。"],
+    ["勤務状況および業務遂行能力を評価している","出退勤、遅刻・早退、業務の質と量。"],
+    ["職場復帰支援プランの実施状況を確認している","決めた配慮が実際に運用されているか。"],
+    ["治療状況（通院の継続、服薬）を確認している",""],
+    ["プランを評価し、必要に応じて見直している","改善しているなら配慮を段階的に解除、悪化しているなら早期に再調整。"],
+    ["職場環境等の改善を検討した","本人の問題としてだけでなく、職場側の要因を見直します。"],
+    ["管理監督者・同僚への配慮を行っている","周囲の負担増を放置すると、次の不調者が出ます。"]
+  ],
+  docs:["フォローアップ面談記録","職場復帰支援プラン（見直し版）","衛生委員会への報告資料（個人が特定されない形で）"],
+  tip:"就業上の配慮を<b>いつ・どの条件で解除するか</b>を、復職時のプラン（⑤フォローアップ）で決めておくと、この段階の判断が大幅に楽になります。",
+  pit:"<b>よくある落とし穴</b><ul><li>復職1か月は手厚くフォローするが、3か月目以降は誰も見ていない。再燃はむしろこの時期に多く見られます。</li><li>本人が「もう大丈夫です」と言うため配慮を一気に解除し、数週間後に再休職となる。</li><li>フォローを担う管理監督者自身が疲弊しているのに、その支援がない。</li></ul>"
+}
+];
+
+let cur = 0;
+const state = STEPS.map(s => s.items.map(() => false));
+
+const stepper = document.getElementById('stepper');
+const panel = document.getElementById('panel');
+const bar = document.getElementById('bar');
+
+function buildStepper(){
+  stepper.innerHTML = '';
+  STEPS.forEach((s,i)=>{
+    const b = document.createElement('button');
+    b.innerHTML = '<span class="n">STEP '+(i+1)+'</span><span class="t">'+s.t+'</span>';
+    if(i===cur) b.className='active';
+    else if(state[i].every(Boolean)) b.className='done';
+    b.onclick = ()=>{cur=i;render();window.scrollTo({top:0,behavior:'smooth'});};
+    stepper.appendChild(b);
+  });
+}
+
+function updateBar(){
+  const total = state.flat().length;
+  const done = state.flat().filter(Boolean).length;
+  bar.style.width = (done/total*100)+'%';
+}
+
+function render(){
+  const s = STEPS[cur];
+  let html = '<section class="card"><h2>'+s.n+'　'+s.t+'</h2><p>'+s.intro+'</p>';
+  html += '<h3>対応チェックリスト</h3><ul class="chk">';
+  s.items.forEach((it,j)=>{
+    html += '<li><label><input type="checkbox" data-j="'+j+'"'+(state[cur][j]?' checked':'')+'>'
+         +  '<span class="txt">'+it[0]+(it[1]?'<span class="note">'+it[1]+'</span>':'')+'</span></label></li>';
+  });
+  html += '</ul>';
+  html += '<h3>この段階で扱う主な書類</h3><div class="docs">'+s.docs.map(d=>'<span>'+d+'</span>').join('')+'</div>';
+  html += '<div class="box tip">'+s.tip+'</div>';
+  html += '<div class="box pit">'+s.pit+'</div>';
+  html += '</section>';
+  panel.innerHTML = html;
+  panel.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.onchange = e=>{ state[cur][+e.target.dataset.j] = e.target.checked; updateBar(); buildStepper(); };
+  });
+  document.getElementById('prev').disabled = (cur===0);
+  document.getElementById('next').disabled = (cur===STEPS.length-1);
+  buildStepper(); updateBar();
+}
+
+document.getElementById('prev').onclick = ()=>{ if(cur>0){cur--;render();window.scrollTo({top:0,behavior:'smooth'});} };
+document.getElementById('next').onclick = ()=>{ if(cur<STEPS.length-1){cur++;render();window.scrollTo({top:0,behavior:'smooth'});} };
+
+document.getElementById('today').valueAsDate = new Date();
+
+document.getElementById('gen').onclick = ()=>{
+  const id = document.getElementById('caseid').value.trim() || '（未記入）';
+  const d  = document.getElementById('today').value || '（未記入）';
+  let t = '職場復帰支援 対応メモ\n';
+  t += '案件識別記号：'+id+'\n記録日：'+d+'\n';
+  t += '準拠：厚生労働省「心の健康問題により休業した労働者の職場復帰支援の手引き」（平成24年7月改訂）\n';
+  t += '='.repeat(46)+'\n\n';
+  STEPS.forEach((s,i)=>{
+    const done = state[i].filter(Boolean).length;
+    t += '【'+s.n+'】'+s.t+'　（'+done+'/'+s.items.length+' 完了）\n';
+    s.items.forEach((it,j)=>{ t += '  ['+(state[i][j]?'済':'　')+'] '+it[0]+'\n'; });
+    const todo = s.items.filter((_,j)=>!state[i][j]);
+    if(todo.length){ t += '  → 未対応：'+todo.map(x=>x[0]).join(' / ')+'\n'; }
+    t += '\n';
+  });
+  const total = state.flat().length, done = state.flat().filter(Boolean).length;
+  t += '='.repeat(46)+'\n全体進捗：'+done+'/'+total+'（'+Math.round(done/total*100)+'%）\n\n';
+  t += '※本メモは一般的な手順の整理です。個別の判断は産業医・主治医・社会保険労務士等にご相談ください。\n';
+  t += '※作成：山岸産業医事務所 休職・復職フローシミュレータ\n';
+  document.getElementById('out').value = t;
+};
+
+document.getElementById('copy').onclick = async ()=>{
+  const ta = document.getElementById('out');
+  if(!ta.value){ alert('先に「メモを生成する」を押してください。'); return; }
+  try{ await navigator.clipboard.writeText(ta.value); alert('コピーしました。'); }
+  catch(e){ ta.select(); document.execCommand('copy'); alert('コピーしました。'); }
+};
+document.getElementById('print').onclick = ()=>window.print();
+
+render();
+</script>
+</body>
+</html>
